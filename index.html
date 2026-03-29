@@ -1,7 +1,1904 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOON:VERSE — 대학 웹툰 전시회 2025</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─────────────────────────────────────────
+       VARIABLES & RESET
+    ───────────────────────────────────────── */
+    :root {
+      --black:    #0a0a0a;
+      --off-white:#f2ede6;
+      --accent:   #ff5c35;
+      --yellow:   #ffd84a;
+      --blue:     #2563eb;
+      --ink:      #1a1a2e;
+      --mid:      #3a3a4c;
+      --light-ink:#ececf4;
+      --nav-h:    64px;
+      --serif:    'Bebas Neue', sans-serif;
+      --body:     'Noto Sans KR', sans-serif;
+      --mono:     'Space Mono', monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+
+    body {
+      background: var(--black);
+      color: var(--off-white);
+      font-family: var(--body);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ─────────────────────────────────────────
+       CUSTOM CURSOR
+    ───────────────────────────────────────── */
+    .cursor-dot {
+      width: 8px; height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.05s;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(255,92,53,0.6);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s ease, width 0.2s, height 0.2s, border-color 0.2s;
+    }
+    .cursor-ring.hover {
+      width: 54px; height: 54px;
+      border-color: var(--yellow);
+      background: rgba(255,216,74,0.06);
+    }
+
+    /* ─────────────────────────────────────────
+       NAVIGATION
+    ───────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 900;
+      display: flex; align-items: center;
+      padding: 0 5vw;
+      transition: background 0.4s, backdrop-filter 0.4s, box-shadow 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(10,10,10,0.88);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+    }
+
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: clamp(22px, 2.4vw, 28px);
+      letter-spacing: 0.06em;
+      color: var(--off-white);
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex; gap: clamp(16px, 2.5vw, 36px);
+      list-style: none;
+      margin-left: auto;
+      align-items: center;
+    }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: clamp(11px, 1vw, 13px);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(242,237,230,0.7);
+      text-decoration: none;
+      position: relative;
+      transition: color 0.2s;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; left: 0; bottom: -3px;
+      width: 0; height: 1.5px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--off-white); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-links .cta-link a {
+      background: var(--accent);
+      color: var(--black);
+      padding: 8px 18px;
+      border-radius: 2px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .nav-links .cta-link a::after { display: none; }
+    .nav-links .cta-link a:hover { background: var(--yellow); color: var(--black); }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column; gap: 5px;
+      cursor: pointer; margin-left: auto;
+      padding: 4px;
+      background: none; border: none;
+    }
+    .hamburger span {
+      display: block; width: 26px; height: 2px;
+      background: var(--off-white);
+      transition: transform 0.35s, opacity 0.35s;
+      transform-origin: center;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed; top: var(--nav-h); left: 0; right: 0;
+      background: rgba(10,10,10,0.97);
+      backdrop-filter: blur(24px);
+      padding: 24px 5vw 32px;
+      z-index: 899;
+      border-bottom: 1px solid rgba(255,92,53,0.2);
+      transform: translateY(-10px);
+      opacity: 0;
+      transition: transform 0.35s, opacity 0.35s;
+    }
+    .mobile-menu.open { transform: translateY(0); opacity: 1; }
+    .mobile-menu ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .mobile-menu a {
+      display: block; padding: 12px 0;
+      font-family: var(--serif);
+      font-size: 32px; letter-spacing: 0.04em;
+      color: var(--off-white);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: color 0.2s, padding-left 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--accent); padding-left: 8px; }
+
+    /* ─────────────────────────────────────────
+       HERO
+    ───────────────────────────────────────── */
+    #hero {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+      padding-top: var(--nav-h);
+    }
+
+    .hero-bg-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+    .hero-bg-noise {
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.4; pointer-events: none;
+    }
+
+    .hero-left {
+      display: flex; flex-direction: column; justify-content: center;
+      padding: clamp(32px, 6vw, 80px) clamp(24px, 5vw, 72px);
+      position: relative; z-index: 2;
+    }
+
+    .hero-tag {
+      font-family: var(--mono);
+      font-size: clamp(10px, 0.9vw, 12px);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-bottom: 20px;
+      opacity: 0; animation: fadeUp 0.7s 0.2s forwards;
+    }
+    .hero-tag::before {
+      content: '';
+      display: inline-block;
+      width: 24px; height: 1.5px;
+      background: var(--accent);
+    }
+
+    .hero-title {
+      font-family: var(--serif);
+      font-size: clamp(52px, 7.5vw, 112px);
+      line-height: 0.9;
+      letter-spacing: 0.02em;
+      opacity: 0; animation: fadeUp 0.8s 0.35s forwards;
+    }
+    .hero-title .accent-word { color: var(--accent); }
+    .hero-title .outline-word {
+      -webkit-text-stroke: 1.5px var(--off-white);
+      color: transparent;
+    }
+
+    .hero-sub {
+      font-size: clamp(13px, 1.1vw, 16px);
+      line-height: 1.75;
+      color: rgba(242,237,230,0.65);
+      max-width: 440px;
+      margin-top: 24px;
+      opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
+    }
+
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap;
+      margin-top: 40px;
+      opacity: 0; animation: fadeUp 0.8s 0.65s forwards;
+    }
+
+    .btn-primary {
+      font-family: var(--mono);
+      font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+      background: var(--accent); color: var(--black);
+      padding: 14px 28px;
+      border: none; border-radius: 2px;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      font-weight: 700;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+      background: var(--yellow);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255,92,53,0.35);
+    }
+    .btn-outline {
+      font-family: var(--mono);
+      font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+      background: transparent;
+      color: var(--off-white);
+      padding: 13px 28px;
+      border: 1.5px solid rgba(242,237,230,0.25);
+      border-radius: 2px;
+      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+    }
+    .btn-outline:hover {
+      border-color: var(--off-white);
+      color: var(--yellow);
+      transform: translateY(-2px);
+    }
+
+    .hero-meta {
+      display: flex; gap: 32px;
+      margin-top: 52px;
+      opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+    }
+    .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+    .hero-meta-num {
+      font-family: var(--serif);
+      font-size: clamp(28px, 3vw, 42px);
+      color: var(--yellow);
+      line-height: 1;
+    }
+    .hero-meta-label {
+      font-family: var(--mono);
+      font-size: 10px; letter-spacing: 0.15em;
+      color: rgba(242,237,230,0.45);
+      text-transform: uppercase;
+    }
+    .hero-meta-sep {
+      width: 1px;
+      background: rgba(255,255,255,0.1);
+      align-self: stretch;
+    }
+
+    /* Hero right — comic panels */
+    .hero-right {
+      position: relative; z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 6px;
+      padding: calc(var(--nav-h) + 20px) clamp(16px, 3vw, 40px) 40px 6px;
+      opacity: 0; animation: fadeRight 0.9s 0.4s forwards;
+    }
+
+    .panel {
+      background: var(--mid);
+      border: 2px solid rgba(255,255,255,0.08);
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.35s, border-color 0.35s, box-shadow 0.35s;
+    }
+    .panel:hover {
+      transform: scale(1.02) rotate(-0.5deg);
+      border-color: var(--accent);
+      box-shadow: 0 12px 40px rgba(255,92,53,0.2);
+      z-index: 10;
+    }
+    .panel-1 { grid-column: 1 / 3; }
+    .panel-1 .panel-inner { padding-bottom: 52%; }
+    .panel-2 .panel-inner,
+    .panel-3 .panel-inner { padding-bottom: 120%; }
+
+    .panel-inner {
+      width: 100%; position: relative;
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d1b3d 50%, #1a2e2a 100%);
+    }
+
+    /* Halftone decorative dots inside panels */
+    .panel-inner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+      background-size: 12px 12px;
+      opacity: 0.4;
+    }
+    .panel-inner::after {
+      content: attr(data-label);
+      position: absolute; bottom: 12px; right: 12px;
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.2vw, 18px);
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.2);
+    }
+
+    .panel-badge {
+      position: absolute; top: 12px; left: 12px;
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      background: var(--accent); color: var(--black);
+      padding: 3px 8px; border-radius: 1px;
+      font-weight: 700;
+    }
+
+    /* SVG illustration inside panels */
+    .panel-art {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .panel-art svg { width: 85%; height: 85%; opacity: 0.7; }
+
+    /* Speed lines decoration */
+    .speed-lines {
+      position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+    }
+    .speed-lines::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 200%; height: 200%;
+      background: repeating-conic-gradient(
+        rgba(255,255,255,0.015) 0deg 2deg,
+        transparent 2deg 8deg
+      );
+      transform: translate(-50%, -50%);
+    }
+
+    .hero-scroll-hint {
+      position: absolute; bottom: 32px; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      z-index: 3;
+      opacity: 0; animation: fadeUp 0.8s 1.1s forwards;
+    }
+    .hero-scroll-hint span {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(242,237,230,0.3);
+    }
+    .scroll-arrow {
+      width: 20px; height: 20px;
+      border-right: 1.5px solid rgba(242,237,230,0.3);
+      border-bottom: 1.5px solid rgba(242,237,230,0.3);
+      transform: rotate(45deg);
+      animation: scrollBounce 1.6s infinite;
+    }
+
+    /* ─────────────────────────────────────────
+       TICKER
+    ───────────────────────────────────────── */
+    .ticker-wrap {
+      background: var(--accent);
+      overflow: hidden;
+      padding: 10px 0;
+      position: relative; z-index: 5;
+    }
+    .ticker-track {
+      display: flex; gap: 0;
+      animation: ticker 20s linear infinite;
+      width: max-content;
+    }
+    .ticker-item {
+      font-family: var(--serif);
+      font-size: clamp(15px, 1.4vw, 18px);
+      letter-spacing: 0.08em;
+      color: var(--black);
+      padding: 0 32px;
+      white-space: nowrap;
+      display: flex; align-items: center; gap: 32px;
+    }
+    .ticker-item::after {
+      content: '✦';
+      font-size: 10px;
+    }
+
+    /* ─────────────────────────────────────────
+       SECTION COMMONS
+    ───────────────────────────────────────── */
+    section { position: relative; }
+    .section-pad { padding: clamp(60px, 8vw, 120px) clamp(20px, 5vw, 80px); }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent);
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-label::before {
+      content: ''; display: inline-block;
+      width: 20px; height: 1.5px; background: var(--accent);
+    }
+
+    .section-title {
+      font-family: var(--serif);
+      font-size: clamp(38px, 5.5vw, 80px);
+      line-height: 0.95;
+      letter-spacing: 0.03em;
+    }
+
+    /* Reveal animation */
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s, transform 0.7s; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ─────────────────────────────────────────
+       ABOUT SECTION
+    ───────────────────────────────────────── */
+    #about {
+      background: var(--ink);
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 6vw, 100px);
+      align-items: center;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-frame {
+      aspect-ratio: 4/5;
+      background: linear-gradient(145deg, #2a1f3d, #1f2d3a, #2d1f1f);
+      border: 2px solid rgba(255,255,255,0.06);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-frame-inner {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 12px;
+    }
+    .about-big-num {
+      font-family: var(--serif);
+      font-size: clamp(80px, 12vw, 160px);
+      color: rgba(255,255,255,0.05);
+      line-height: 1;
+      position: absolute;
+      bottom: -10px; right: 10px;
+      letter-spacing: -0.04em;
+    }
+    .about-sticker {
+      position: absolute;
+      background: var(--yellow);
+      color: var(--black);
+      font-family: var(--serif);
+      font-size: clamp(12px, 1.2vw, 16px);
+      letter-spacing: 0.06em;
+      padding: 8px 16px;
+      transform: rotate(-4deg);
+      top: 24px; left: -16px;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
+    }
+    .about-sticker-2 {
+      position: absolute;
+      background: var(--accent);
+      color: var(--black);
+      font-family: var(--mono);
+      font-size: 10px; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      transform: rotate(3deg);
+      bottom: 40px; left: -16px;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.4);
+    }
+    .about-text-block { display: flex; flex-direction: column; gap: 20px; }
+    .about-body {
+      font-size: clamp(14px, 1.1vw, 16px);
+      line-height: 1.85;
+      color: rgba(242,237,230,0.7);
+    }
+    .about-features {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 16px; margin-top: 8px;
+    }
+    .feature-pill {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--mono);
+      font-size: 11px; letter-spacing: 0.06em;
+      color: rgba(242,237,230,0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 14px; border-radius: 2px;
+      transition: border-color 0.25s, color 0.25s, background 0.25s;
+    }
+    .feature-pill:hover {
+      border-color: var(--accent);
+      color: var(--off-white);
+      background: rgba(255,92,53,0.07);
+    }
+    .feature-pill-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ─────────────────────────────────────────
+       GALLERY / HIGHLIGHTS
+    ───────────────────────────────────────── */
+    #gallery {
+      background: var(--black);
+    }
+    .gallery-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      flex-wrap: wrap; gap: 20px;
+      margin-bottom: clamp(32px, 4vw, 60px);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto;
+      gap: 6px;
+    }
+    .gcard {
+      position: relative;
+      overflow: hidden;
+      border-radius: 3px;
+      border: 2px solid rgba(255,255,255,0.05);
+      background: var(--mid);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .gcard:hover { border-color: rgba(255,92,53,0.4); box-shadow: 0 8px 32px rgba(255,92,53,0.12); }
+    .gcard-inner { padding-bottom: 130%; position: relative; }
+    .gcard-bg {
+      position: absolute; inset: 0;
+    }
+    .gcard-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.85) 0%, transparent 50%);
+      opacity: 0; transition: opacity 0.35s;
+    }
+    .gcard:hover .gcard-overlay { opacity: 1; }
+    .gcard-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 16px;
+      transform: translateY(8px); opacity: 0;
+      transition: transform 0.35s, opacity 0.35s;
+    }
+    .gcard:hover .gcard-info { transform: translateY(0); opacity: 1; }
+    .gcard-name {
+      font-family: var(--serif);
+      font-size: clamp(14px, 1.2vw, 18px);
+      letter-spacing: 0.04em;
+      color: var(--off-white);
+    }
+    .gcard-genre {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); margin-top: 3px;
+    }
+    .gcard:nth-child(1)  { grid-column: 1 / 6;  grid-row: 1; }
+    .gcard:nth-child(2)  { grid-column: 6 / 9;  grid-row: 1; }
+    .gcard:nth-child(3)  { grid-column: 9 / 13; grid-row: 1; }
+    .gcard:nth-child(4)  { grid-column: 1 / 4;  grid-row: 2; }
+    .gcard:nth-child(5)  { grid-column: 4 / 8;  grid-row: 2; }
+    .gcard:nth-child(6)  { grid-column: 8 / 13; grid-row: 2; }
+
+    /* gradient bg patterns per card */
+    .bg-a { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); }
+    .bg-b { background: linear-gradient(135deg, #1a3c2e, #2d5a3d, #0d1f16); }
+    .bg-c { background: linear-gradient(135deg, #3d1a1a, #5c2d2d, #1f0f0f); }
+    .bg-d { background: linear-gradient(135deg, #1a1f3c, #2b2d5a, #0f1024); }
+    .bg-e { background: linear-gradient(135deg, #2a1f0f, #4a3820, #1a1209); }
+    .bg-f { background: linear-gradient(135deg, #1a2a3c, #2d4a5c, #0d1a24); }
+
+    /* Halftone on cards */
+    .gcard-inner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+      background-size: 14px 14px;
+      z-index: 1;
+    }
+    /* Comic panel character silhouettes */
+    .gcard-char {
+      position: absolute; bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      z-index: 2; width: 70%; opacity: 0.4;
+    }
+
+    /* ─────────────────────────────────────────
+       ARTISTS
+    ───────────────────────────────────────── */
+    #artists {
+      background: var(--ink);
+    }
+    .artists-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: clamp(16px, 2vw, 28px);
+      margin-top: clamp(32px, 4vw, 56px);
+    }
+    .artist-card {
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.07);
+      border-radius: 4px;
+      padding: 24px 20px;
+      display: flex; flex-direction: column;
+      gap: 12px;
+      transition: transform 0.3s, border-color 0.3s, background 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .artist-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--artist-color, var(--accent));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.35s;
+    }
+    .artist-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--artist-color, var(--accent));
+      background: rgba(255,255,255,0.05);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+    .artist-card:hover::before { transform: scaleX(1); }
+
+    .artist-avatar {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--serif);
+      font-size: 24px; letter-spacing: 0.02em;
+      background: var(--artist-color, var(--accent));
+      color: var(--black);
+      flex-shrink: 0;
+    }
+    .artist-name {
+      font-family: var(--serif);
+      font-size: clamp(16px, 1.4vw, 20px);
+      letter-spacing: 0.04em;
+    }
+    .artist-major {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(242,237,230,0.45);
+    }
+    .artist-genre-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .tag {
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 3px 8px; border-radius: 1px;
+      color: rgba(242,237,230,0.55);
+    }
+    .artist-sns { margin-top: auto; display: flex; gap: 12px; }
+    .sns-link {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(242,237,230,0.35);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .sns-link:hover { color: var(--artist-color, var(--accent)); }
+
+    /* ─────────────────────────────────────────
+       SCHEDULE / INFO
+    ───────────────────────────────────────── */
+    #info {
+      background: var(--black);
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 6vw, 100px);
+      align-items: start;
+      margin-top: clamp(32px, 4vw, 56px);
+    }
+    .schedule-list { display: flex; flex-direction: column; gap: 0; }
+    .schedule-item {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 20px;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background 0.2s;
+    }
+    .schedule-item:hover { background: rgba(255,255,255,0.02); }
+    .schedule-date {
+      font-family: var(--serif);
+      font-size: clamp(13px, 1.1vw, 15px);
+      color: var(--accent);
+      letter-spacing: 0.06em;
+    }
+    .schedule-event {
+      font-size: clamp(13px, 1.1vw, 15px);
+      color: rgba(242,237,230,0.75);
+      line-height: 1.5;
+    }
+    .schedule-event strong { color: var(--off-white); display: block; margin-bottom: 2px; }
+
+    .info-aside { display: flex; flex-direction: column; gap: 20px; }
+    .info-box {
+      background: rgba(255,255,255,0.03);
+      border: 1.5px solid rgba(255,255,255,0.07);
+      border-radius: 4px;
+      padding: 24px 22px;
+      transition: border-color 0.25s;
+    }
+    .info-box:hover { border-color: rgba(255,92,53,0.3); }
+    .info-box-title {
+      font-family: var(--mono);
+      font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 12px;
+    }
+    .info-box-body {
+      font-size: clamp(13px, 1.05vw, 15px);
+      line-height: 1.75;
+      color: rgba(242,237,230,0.65);
+    }
+    .info-box-body strong { color: var(--off-white); }
+
+    /* ─────────────────────────────────────────
+       LOCATION
+    ───────────────────────────────────────── */
+    #location {
+      background: var(--ink);
+    }
+    .location-grid {
+      display: grid;
+      grid-template-columns: 5fr 4fr;
+      gap: clamp(32px, 5vw, 80px);
+      align-items: start;
+      margin-top: clamp(32px, 4vw, 56px);
+    }
+
+    /* Map placeholder (clickable) */
+    .map-embed {
+      aspect-ratio: 16/10;
+      background: linear-gradient(135deg, #111827 0%, #1a2535 100%);
+      border: 2px solid rgba(255,255,255,0.07);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .map-embed:hover {
+      border-color: rgba(255,92,53,0.4);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .map-grid-lines {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+    .map-pin {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex; flex-direction: column; align-items: center;
+      animation: pinBounce 2s ease-in-out infinite;
+    }
+    .map-pin-head {
+      width: 20px; height: 20px;
+      background: var(--accent);
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      box-shadow: 0 0 0 4px rgba(255,92,53,0.2);
+    }
+    .map-pin-pulse {
+      position: absolute;
+      width: 44px; height: 44px;
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      animation: pulsate 2s ease-out infinite;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+    }
+    .map-label {
+      margin-top: 10px;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.08em;
+      background: rgba(0,0,0,0.7);
+      color: var(--off-white);
+      padding: 4px 10px; border-radius: 2px;
+    }
+    .map-open-label {
+      position: absolute; bottom: 16px; right: 16px;
+      display: flex; gap: 8px;
+    }
+    .map-btn {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 8px 14px; border-radius: 2px;
+      text-decoration: none; font-weight: 700;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .map-btn:hover { transform: translateY(-2px); }
+    .map-btn-naver {
+      background: #03c75a; color: #fff;
+      box-shadow: 0 4px 12px rgba(3,199,90,0.3);
+    }
+    .map-btn-kakao {
+      background: #fee500; color: #000;
+      box-shadow: 0 4px 12px rgba(254,229,0,0.3);
+    }
+
+    .location-info { display: flex; flex-direction: column; gap: 20px; }
+    .loc-item {
+      display: flex; gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .loc-icon {
+      width: 36px; height: 36px; flex-shrink: 0;
+      border: 1.5px solid rgba(255,92,53,0.4);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .loc-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 5px;
+    }
+    .loc-body {
+      font-size: clamp(13px, 1.1vw, 15px);
+      line-height: 1.7;
+      color: rgba(242,237,230,0.7);
+    }
+    .loc-body strong { color: var(--off-white); }
+
+    .transport-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px;
+    }
+    .transport-item {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 2px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: rgba(242,237,230,0.6);
+      line-height: 1.5;
+    }
+    .transport-item strong { color: var(--yellow); display: block; font-size: 11px; margin-bottom: 2px; }
+
+    /* ─────────────────────────────────────────
+       CTA BANNER
+    ───────────────────────────────────────── */
+    #cta {
+      background: var(--accent);
+      padding: clamp(48px, 6vw, 80px) clamp(20px, 5vw, 80px);
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    #cta::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+    .cta-title {
+      font-family: var(--serif);
+      font-size: clamp(42px, 7vw, 100px);
+      color: var(--black);
+      line-height: 0.9;
+      position: relative; z-index: 1;
+      letter-spacing: 0.02em;
+    }
+    .cta-sub {
+      font-family: var(--mono); font-size: clamp(12px, 1vw, 14px);
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(0,0,0,0.55);
+      margin-top: 16px; position: relative; z-index: 1;
+    }
+    .cta-actions {
+      margin-top: 32px; display: flex; gap: 16px;
+      justify-content: center; flex-wrap: wrap;
+      position: relative; z-index: 1;
+    }
+    .btn-dark {
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      background: var(--black); color: var(--off-white);
+      padding: 14px 32px; border-radius: 2px;
+      text-decoration: none; font-weight: 700;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .btn-dark:hover { background: var(--ink); transform: translateY(-2px); }
+    .btn-white-outline {
+      font-family: var(--mono); font-size: 12px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      background: transparent;
+      color: var(--black);
+      padding: 13px 32px; border-radius: 2px;
+      border: 1.5px solid rgba(0,0,0,0.4);
+      text-decoration: none;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .btn-white-outline:hover { border-color: var(--black); transform: translateY(-2px); }
+
+    /* ─────────────────────────────────────────
+       FOOTER
+    ───────────────────────────────────────── */
+    footer {
+      background: var(--black);
+      padding: clamp(40px, 5vw, 72px) clamp(20px, 5vw, 80px) 28px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      flex-wrap: wrap; gap: 32px;
+      margin-bottom: 48px;
+    }
+    .footer-logo {
+      font-family: var(--serif);
+      font-size: clamp(28px, 3vw, 40px);
+      letter-spacing: 0.04em;
+    }
+    .footer-logo span { color: var(--accent); }
+    .footer-tagline {
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(242,237,230,0.3); margin-top: 6px;
+    }
+    .footer-cols {
+      display: flex; gap: clamp(32px, 5vw, 80px); flex-wrap: wrap;
+    }
+    .footer-col-title {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.16em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px;
+    }
+    .footer-links { display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a {
+      font-size: 13px;
+      color: rgba(242,237,230,0.5);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--off-white); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-copy {
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 0.1em;
+      color: rgba(242,237,230,0.25);
+    }
+
+    /* ─────────────────────────────────────────
+       KEYFRAMES
+    ───────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeRight {
+      from { opacity: 0; transform: translateX(24px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @keyframes scrollBounce {
+      0%, 100% { transform: rotate(45deg) translateY(0); }
+      50%       { transform: rotate(45deg) translateY(5px); }
+    }
+    @keyframes pinBounce {
+      0%, 100% { transform: translate(-50%, -50%); }
+      50%       { transform: translate(-50%, calc(-50% - 8px)); }
+    }
+    @keyframes pulsate {
+      0%   { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(2);   opacity: 0; }
+    }
+
+    /* ─────────────────────────────────────────
+       RESPONSIVE — TABLET
+    ───────────────────────────────────────── */
+    @media (max-width: 900px) {
+      #hero {
+        grid-template-columns: 1fr;
+        min-height: unset;
+        padding-top: var(--nav-h);
+      }
+      .hero-right {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: unset;
+        padding: 20px clamp(20px, 4vw, 40px) 24px;
+        opacity: 1; animation: none;
+      }
+      .panel-1 { grid-column: 1 / 3; grid-row: auto; }
+      .panel-1 .panel-inner { padding-bottom: 65%; }
+      .panel-2 .panel-inner,
+      .panel-3 .panel-inner { padding-bottom: 100%; }
+
+      .about-grid,
+      .info-grid,
+      .location-grid {
+        grid-template-columns: 1fr;
+      }
+      .about-visual { max-width: 360px; }
+      .about-frame { aspect-ratio: 16/9; }
+
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto;
+      }
+      .gcard:nth-child(1) { grid-column: 1 / 3; }
+      .gcard:nth-child(2) { grid-column: 3 / 4; }
+      .gcard:nth-child(3) { grid-column: 1 / 2; }
+      .gcard:nth-child(4) { grid-column: 2 / 4; }
+      .gcard:nth-child(5) { grid-column: 1 / 3; }
+      .gcard:nth-child(6) { grid-column: 3 / 4; }
+
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .mobile-menu { display: block; }
+
+      body { cursor: auto; }
+      .cursor-dot, .cursor-ring { display: none; }
+    }
+
+    /* ─────────────────────────────────────────
+       RESPONSIVE — MOBILE
+    ───────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .hero-right {
+        grid-template-columns: 1fr 1fr;
+      }
+      .panel-1 { grid-column: 1 / 3; }
+      .panel-2, .panel-3 { grid-column: span 1; }
+
+      .gallery-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .gcard:nth-child(1) { grid-column: 1 / 3; }
+      .gcard:nth-child(2) { grid-column: 1 / 2; }
+      .gcard:nth-child(3) { grid-column: 2 / 3; }
+      .gcard:nth-child(4) { grid-column: 1 / 2; }
+      .gcard:nth-child(5) { grid-column: 2 / 3; }
+      .gcard:nth-child(6) { grid-column: 1 / 3; }
+
+      .about-features { grid-template-columns: 1fr; }
+      .heroes-meta { gap: 20px; }
+      .transport-grid { grid-template-columns: 1fr; }
+      .map-open-label { flex-direction: column; right: 12px; bottom: 12px; }
+
+      .footer-cols { gap: 24px; }
+    }
+
+    /* Hover interaction for map-embed */
+    .map-embed-link { display: block; cursor: pointer; }
+  </style>
+</head>
 <body>
-    <h1>제 첫 번째 웹사이트입니다!</h1>
-    <p>깃허브 페이지로 호스팅 중입니다.</p>
+
+  <!-- CURSOR -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ═══════════════════ NAV ═══════════════════ -->
+  <nav id="mainNav">
+    <a href="#hero" class="nav-logo">TOON<span>:</span>VERSE</a>
+    <ul class="nav-links">
+      <li><a href="#hero">홈</a></li>
+      <li><a href="#about">소개</a></li>
+      <li><a href="#gallery">갤러리</a></li>
+      <li><a href="#artists">그림 작가들</a></li>
+      <li><a href="#info">일정</a></li>
+      <li><a href="#location">오시는 길</a></li>
+      <li class="cta-link"><a href="#cta">관람 등록 →</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="메뉴 열기">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="#hero"     class="mobile-nav-link">홈</a></li>
+      <li><a href="#about"    class="mobile-nav-link">소개</a></li>
+      <li><a href="#gallery"  class="mobile-nav-link">갤러리</a></li>
+      <li><a href="#artists"  class="mobile-nav-link">그림 작가들</a></li>
+      <li><a href="#info"     class="mobile-nav-link">일정</a></li>
+      <li><a href="#location" class="mobile-nav-link">오시는 길</a></li>
+    </ul>
+  </div>
+
+  <!-- ═══════════════════ HERO ═══════════════════ -->
+  <section id="hero">
+    <div class="hero-bg-grid"></div>
+    <div class="hero-bg-noise"></div>
+
+    <div class="hero-left">
+      <div class="hero-tag">2025 대학 웹툰 전시회</div>
+      <h1 class="hero-title">
+        TOON<br>
+        <span class="outline-word">VERSE</span><br>
+        <span class="accent-word">2025</span>
+      </h1>
+      <p class="hero-sub">
+        상상이 페이지를 넘어 현실로. 미래의 웹툰 작가들이 모인
+        역대 최대 규모 대학 웹툰 전시회에 당신을 초대합니다.
+      </p>
+      <div class="hero-actions">
+        <a href="#artists" class="btn-primary">작가 & 작품 보기 →</a>
+        <a href="#location" class="btn-outline">오시는 길</a>
+      </div>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-num">48</span>
+          <span class="hero-meta-label">참여 작가</span>
+        </div>
+        <div class="hero-meta-sep"></div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-num">120+</span>
+          <span class="hero-meta-label">전시 작품</span>
+        </div>
+        <div class="hero-meta-sep"></div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-num">7일</span>
+          <span class="hero-meta-label">전시 기간</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="panel panel-1">
+        <div class="panel-inner" data-label="FEATURED">
+          <div class="speed-lines"></div>
+          <div class="panel-art">
+            <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="rg1" cx="50%" cy="50%" r="60%">
+                  <stop offset="0%" stop-color="#ff5c35" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#2563eb" stop-opacity="0.1"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="150" cy="100" rx="120" ry="80" fill="url(#rg1)"/>
+              <text x="150" y="115" text-anchor="middle" font-family="'Bebas Neue'" font-size="64" fill="rgba(255,255,255,0.15)" letter-spacing="4">WEBTOON</text>
+              <!-- floating shapes -->
+              <rect x="20" y="30" width="30" height="30" rx="2" fill="rgba(255,92,53,0.3)" transform="rotate(15 35 45)"/>
+              <circle cx="260" cy="160" r="20" fill="rgba(37,99,235,0.3)"/>
+              <polygon points="80,150 100,110 120,150" fill="rgba(255,216,74,0.3)"/>
+            </svg>
+          </div>
+          <span class="panel-badge">MAIN</span>
+        </div>
+      </div>
+      <div class="panel panel-2">
+        <div class="panel-inner" data-label="ROMANCE">
+          <div class="panel-art">
+            <svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="rg2" cx="50%" cy="40%">
+                  <stop offset="0%" stop-color="#ff6b9d" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#c850c0" stop-opacity="0.1"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="80" cy="90" rx="65" ry="80" fill="url(#rg2)"/>
+              <text x="80" y="105" text-anchor="middle" font-family="'Bebas Neue'" font-size="40" fill="rgba(255,255,255,0.15)">LOVE</text>
+              <circle cx="40" cy="50" r="12" fill="rgba(255,107,157,0.35)"/>
+              <circle cx="120" cy="140" r="18" fill="rgba(200,80,192,0.25)"/>
+            </svg>
+          </div>
+          <span class="panel-badge">로맨스</span>
+        </div>
+      </div>
+      <div class="panel panel-3">
+        <div class="panel-inner" data-label="ACTION">
+          <div class="panel-art">
+            <svg viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <radialGradient id="rg3" cx="50%" cy="40%">
+                  <stop offset="0%" stop-color="#ffd84a" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#ff5c35" stop-opacity="0.1"/>
+                </radialGradient>
+              </defs>
+              <ellipse cx="80" cy="90" rx="65" ry="80" fill="url(#rg3)"/>
+              <text x="80" y="105" text-anchor="middle" font-family="'Bebas Neue'" font-size="36" fill="rgba(255,255,255,0.15)">ACTION</text>
+              <polygon points="30,60 55,30 55,55 80,25 75,55 100,35 90,65" fill="rgba(255,216,74,0.3)"/>
+            </svg>
+          </div>
+          <span class="panel-badge">액션</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-scroll-hint">
+      <span>스크롤</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ TICKER ═══════════════════ -->
+  <div class="ticker-wrap">
+    <div class="ticker-track">
+      <span class="ticker-item">TOON:VERSE 2025</span>
+      <span class="ticker-item">대학 웹툰 전시회</span>
+      <span class="ticker-item">2025.05.14 — 05.21</span>
+      <span class="ticker-item">48 ARTISTS</span>
+      <span class="ticker-item">120+ WORKS</span>
+      <span class="ticker-item">FREE ADMISSION</span>
+      <span class="ticker-item">TOON:VERSE 2025</span>
+      <span class="ticker-item">대학 웹툰 전시회</span>
+      <span class="ticker-item">2025.05.14 — 05.21</span>
+      <span class="ticker-item">48 ARTISTS</span>
+      <span class="ticker-item">120+ WORKS</span>
+      <span class="ticker-item">FREE ADMISSION</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ ABOUT ═══════════════════ -->
+  <section id="about" class="section-pad">
+    <div class="about-grid">
+      <div class="about-visual reveal">
+        <div class="about-frame">
+          <div class="about-frame-inner">
+            <svg width="70%" viewBox="0 0 280 320" xmlns="http://www.w3.org/2000/svg" style="opacity:0.6">
+              <defs>
+                <linearGradient id="lg-about" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ff5c35" stop-opacity="0.8"/>
+                  <stop offset="50%" stop-color="#2563eb" stop-opacity="0.5"/>
+                  <stop offset="100%" stop-color="#ffd84a" stop-opacity="0.4"/>
+                </linearGradient>
+              </defs>
+              <!-- Comic panel grid -->
+              <rect x="10" y="10" width="120" height="80"  rx="2" fill="rgba(255,92,53,0.12)"  stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+              <rect x="140" y="10" width="130" height="120" rx="2" fill="rgba(37,99,235,0.12)"   stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+              <rect x="10" y="100" width="120" height="120" rx="2" fill="rgba(255,216,74,0.1)"  stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
+              <rect x="10" y="230" width="260" height="80"  rx="2" fill="rgba(255,92,53,0.08)"  stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+              <rect x="140" y="140" width="130" height="80" rx="2" fill="rgba(37,99,235,0.1)"   stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+              <!-- star / speed element -->
+              <circle cx="70" cy="50"  r="18" fill="rgba(255,216,74,0.3)"/>
+              <circle cx="205" cy="65" r="28" fill="rgba(255,92,53,0.2)"/>
+              <circle cx="70" cy="160" r="22" fill="rgba(37,99,235,0.25)"/>
+              <text x="140" y="275" text-anchor="middle" font-family="'Bebas Neue'" font-size="18" fill="rgba(255,255,255,0.35)" letter-spacing="4">WEBTOON STORY</text>
+            </svg>
+          </div>
+          <div class="about-big-num">25</div>
+        </div>
+        <div class="about-sticker">✦ 2025 전시</div>
+        <div class="about-sticker-2">Since 2018</div>
+      </div>
+
+      <div class="about-text-block">
+        <div class="reveal reveal-delay-1">
+          <div class="section-label">About</div>
+          <h2 class="section-title">상상을<br>넘어서다</h2>
+        </div>
+        <p class="about-body reveal reveal-delay-2">
+          TOON:VERSE는 전국 대학 웹툰 전공 학생들의 창작물을 한자리에 모은
+          국내 최대 규모의 대학 웹툰 전시회입니다. 2018년 소규모 교내 행사에서
+          시작하여, 이제는 48명의 신진 작가와 120여 점의 작품이 함께하는
+          성장한 축제가 되었습니다.
+        </p>
+        <p class="about-body reveal reveal-delay-2">
+          로맨스, 액션, 판타지, 일상 등 다양한 장르를 아우르는 이번 전시에서
+          미래 한국 웹툰을 이끌어갈 새로운 목소리를 만나보세요.
+        </p>
+        <div class="about-features reveal reveal-delay-3">
+          <div class="feature-pill"><span class="feature-pill-dot"></span>무료 입장</div>
+          <div class="feature-pill"><span class="feature-pill-dot"></span>작가 사인회</div>
+          <div class="feature-pill"><span class="feature-pill-dot"></span>굿즈 판매</div>
+          <div class="feature-pill"><span class="feature-pill-dot"></span>특별 강연</div>
+          <div class="feature-pill"><span class="feature-pill-dot"></span>포토존</div>
+          <div class="feature-pill"><span class="feature-pill-dot"></span>심사 시상</div>
+        </div>
+        <div class="reveal reveal-delay-4">
+          <a href="#gallery" class="btn-primary">전시 작품 보기 →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ GALLERY ═══════════════════ -->
+  <section id="gallery" class="section-pad">
+    <div class="gallery-header">
+      <div>
+        <div class="section-label reveal">Gallery</div>
+        <h2 class="section-title reveal reveal-delay-1">주요 작품</h2>
+      </div>
+      <a href="#artists" class="btn-outline reveal reveal-delay-2">모든 작품 보기 →</a>
+    </div>
+
+    <div class="gallery-grid">
+      <div class="gcard reveal">
+        <div class="gcard-inner">
+          <div class="gcard-bg bg-a"></div>
+          <div style="position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px);background-size:14px 14px;"></div>
+          <svg class="gcard-char" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg" style="z-index:2">
+            <ellipse cx="100" cy="80" rx="40" ry="45" fill="rgba(255,255,255,0.15)"/>
+            <rect x="60" y="120" width="80" height="120" rx="8" fill="rgba(255,255,255,0.1)"/>
+            <rect x="30" y="125" width="35" height="90" rx="6" fill="rgba(255,255,255,0.08)"/>
+            <rect x="135" y="125" width="35" height="90" rx="6" fill="rgba(255,255,255,0.08)"/>
+            <rect x="65" y="240" width="30" height="40" rx="4" fill="rgba(255,255,255,0.1)"/>
+            <rect x="105" y="240" width="30" height="40" rx="4" fill="rgba(255,255,255,0.1)"/>
+          </svg>
+        </div>
+        <div class="gcard-overlay"></div>
+        <div class="gcard-info">
+          <div class="gcard-name">별빛 탐정 사무소</div>
+          <div class="gcard-genre">미스터리 · 판타지</div>
+        </div>
+      </div>
+
+      <div class="gcard reveal reveal-delay-1">
+        <div class="gcard-inner">
+          <div class="gcard-bg bg-b"></div>
+          <div style="position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px);background-size:14px 14px;"></div>
+          <svg class="gcard-char" viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="z-index:2">
+            <ellipse cx="80" cy="55" rx="28" ry="32" fill="rgba(255,255,255,0.15)"/>
+            <rect x="52" y="82" width="56" height="80" rx="6" fill="rgba(255,255,255,0.1)"/>
+            <path d="M56 110 Q35 120 30 150" stroke="rgba(255,255,255,0.12)" stroke-width="10" fill="none" stroke-linecap="round"/>
+            <path d="M104 110 Q125 120 130 150" stroke="rgba(255,255,255,0.12)" stroke-width="10" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="gcard-overlay"></div>
+        <div class="gcard-info">
+          <div class="gcard-name">숲의 수호자</div>
+          <div class="gcard-genre">판타지 · 모험</div>
+        </div>
+      </div>
+
+      <div class="gcard reveal reveal-delay-2">
+        <div class="gcard-inner">
+          <div class="gcard-bg bg-c"></div>
+          <div style="position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px);background-size:14px 14px;"></div>
+          <svg class="gcard-char" viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="z-index:2">
+            <polygon points="80,20 100,70 155,70 110,100 130,150 80,120 30,150 50,100 5,70 60,70" fill="rgba(255,92,53,0.3)"/>
+            <circle cx="80" cy="90" r="24" fill="rgba(255,255,255,0.1)"/>
+          </svg>
+        </div>
+        <div class="gcard-overlay"></div>
+        <div class="gcard-info">
+          <div class="gcard-name">레드 스타 파이터</div>
+          <div class="gcard-genre">액션 · 배틀</div>
+        </div>
+      </div>
+
+      <div class="gcard reveal reveal-delay-1">
+        <div class="gcard-inner">
+          <div class="gcard-bg bg-d"></div>
+          <div style="position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px);background-size:14px 14px;"></div>
+          <svg class="gcard-char" viewBox="0 0 160 200" xmlns="http://www.w3.org/2000/svg" style="z-index:2">
+            <circle cx="80" cy="60" r="30" fill="rgba(37,99,235,0.3)"/>
+            <circle cx="80" cy="60" r="18" fill="rgba(255,255,255,0.1)"/>
+            <rect x="55" y="90" width="50" height="80" rx="5" fill="rgba(255,255,255,0.08)"/>
+          </svg>
+        </div>
+        <div class="gcard-overlay"></div>
+        <div class="gcard-info">
+          <div class="gcard-name">달의 기억</div>
+          <div class="gcard-genre">SF · 감성</div>
+        </div>
+      </div>
+
+      <div class="gcard reveal reveal-delay-2">
+        <div class="gcard-inner">
+          <div class="gcard-bg bg-e"></div>
+          <div style="position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px);background-size:14px 14px;"></div>
+          <svg class="gcard-char" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="z-index:2">
+            <path d="M30 170 Q80 80 100 60 Q120 80 170 170" fill="rgba(255,216,74,0.2)" stroke="rgba(255,216,74,0.4)" stroke-width="2"/>
+            <circle cx="100" cy="55" r="22" fill="rgba(255,255,255,0.12)"/>
+            <circle cx="65" cy="120" r="14" fill="rgba(255,216,74,0.25)"/>
+            <circle cx="135" cy="120" r="14" fill="rgba(255,216,74,0.25)"/>
+          </svg>
+        </div>
+        <div class="gcard-overlay"></div>
+        <div class="gcard-info">
+          <div class="gcard-name">오늘도 너와</div>
+          <div class="gcard-genre">일상 · 로맨스</div>
+        </div>
+      </div>
+
+      <div class="gcard reveal reveal-delay-3">
+        <div class="gcard-inner">
+          <div class="gcard-bg bg-f"></div>
+          <div style="position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px);background-size:14px 14px;"></div>
+          <svg class="gcard-char" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="z-index:2">
+            <rect x="30" y="30" width="60" height="60" rx="4" fill="rgba(37,99,235,0.2)" transform="rotate(10 60 60)"/>
+            <rect x="110" y="60" width="60" height="60" rx="4" fill="rgba(255,92,53,0.2)" transform="rotate(-8 140 90)"/>
+            <rect x="60" y="120" width="80" height="50" rx="4" fill="rgba(255,216,74,0.15)" transform="rotate(3 100 145)"/>
+          </svg>
+        </div>
+        <div class="gcard-overlay"></div>
+        <div class="gcard-info">
+          <div class="gcard-name">조각들</div>
+          <div class="gcard-genre">실험 · 아트</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ ARTISTS ═══════════════════ -->
+  <section id="artists" class="section-pad">
+    <div class="section-label reveal">Artists</div>
+    <h2 class="section-title reveal reveal-delay-1">그림 작가들</h2>
+    <p style="font-size:clamp(13px,1.1vw,16px);color:rgba(242,237,230,0.5);margin-top:12px;max-width:520px;" class="reveal reveal-delay-2">
+      이번 전시에 참여하는 48인의 작가 중 일부를 소개합니다.
+    </p>
+
+    <div class="artists-grid">
+      <div class="artist-card reveal" style="--artist-color:#ff5c35">
+        <div class="artist-avatar">김</div>
+        <div>
+          <div class="artist-name">김하늘</div>
+          <div class="artist-major">시각 디자인과 4학년</div>
+        </div>
+        <div class="artist-genre-tags">
+          <span class="tag">판타지</span><span class="tag">모험</span>
+        </div>
+        <div class="artist-sns">
+          <a href="#" class="sns-link">Instagram</a>
+          <a href="#" class="sns-link">Webtoon</a>
+        </div>
+      </div>
+
+      <div class="artist-card reveal reveal-delay-1" style="--artist-color:#2563eb">
+        <div class="artist-avatar">이</div>
+        <div>
+          <div class="artist-name">이서준</div>
+          <div class="artist-major">만화 애니메이션과 3학년</div>
+        </div>
+        <div class="artist-genre-tags">
+          <span class="tag">액션</span><span class="tag">배틀</span>
+        </div>
+        <div class="artist-sns">
+          <a href="#" class="sns-link">Instagram</a>
+          <a href="#" class="sns-link">X</a>
+        </div>
+      </div>
+
+      <div class="artist-card reveal reveal-delay-2" style="--artist-color:#ffd84a">
+        <div class="artist-avatar">박</div>
+        <div>
+          <div class="artist-name">박소율</div>
+          <div class="artist-major">영상학과 4학년</div>
+        </div>
+        <div class="artist-genre-tags">
+          <span class="tag">로맨스</span><span class="tag">일상</span>
+        </div>
+        <div class="artist-sns">
+          <a href="#" class="sns-link">Instagram</a>
+        </div>
+      </div>
+
+      <div class="artist-card reveal reveal-delay-1" style="--artist-color:#c084fc">
+        <div class="artist-avatar">최</div>
+        <div>
+          <div class="artist-name">최민준</div>
+          <div class="artist-major">미술학과 3학년</div>
+        </div>
+        <div class="artist-genre-tags">
+          <span class="tag">SF</span><span class="tag">실험적</span>
+        </div>
+        <div class="artist-sns">
+          <a href="#" class="sns-link">Instagram</a>
+          <a href="#" class="sns-link">Portfolio</a>
+        </div>
+      </div>
+
+      <div class="artist-card reveal reveal-delay-2" style="--artist-color:#34d399">
+        <div class="artist-avatar">정</div>
+        <div>
+          <div class="artist-name">정유나</div>
+          <div class="artist-major">회화과 2학년</div>
+        </div>
+        <div class="artist-genre-tags">
+          <span class="tag">공포</span><span class="tag">미스터리</span>
+        </div>
+        <div class="artist-sns">
+          <a href="#" class="sns-link">Instagram</a>
+        </div>
+      </div>
+
+      <div class="artist-card reveal reveal-delay-3" style="--artist-color:#fb923c">
+        <div class="artist-avatar">강</div>
+        <div>
+          <div class="artist-name">강도현</div>
+          <div class="artist-major">산업 디자인과 4학년</div>
+        </div>
+        <div class="artist-genre-tags">
+          <span class="tag">스포츠</span><span class="tag">청춘</span>
+        </div>
+        <div class="artist-sns">
+          <a href="#" class="sns-link">Instagram</a>
+          <a href="#" class="sns-link">Webtoon</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ INFO / SCHEDULE ═══════════════════ -->
+  <section id="info" class="section-pad" style="background:var(--black)">
+    <div class="section-label reveal">Schedule</div>
+    <h2 class="section-title reveal reveal-delay-1">전시 일정</h2>
+
+    <div class="info-grid">
+      <div>
+        <div class="schedule-list" style="margin-top:clamp(24px,3vw,40px)">
+          <div class="schedule-item reveal">
+            <span class="schedule-date">05.14 WED</span>
+            <div class="schedule-event"><strong>개막식 & 오프닝 파티</strong>오후 5시 — 메인 홀 | 작가 전원 참석</div>
+          </div>
+          <div class="schedule-item reveal reveal-delay-1">
+            <span class="schedule-date">05.15 THU</span>
+            <div class="schedule-event"><strong>작가 토크 — 1부</strong>오후 2시 — 세미나실 | 김하늘, 이서준</div>
+          </div>
+          <div class="schedule-item reveal reveal-delay-2">
+            <span class="schedule-date">05.16 FRI</span>
+            <div class="schedule-event"><strong>라이브 드로잉 세션</strong>오후 3시 — 오픈 스튜디오</div>
+          </div>
+          <div class="schedule-item reveal reveal-delay-3">
+            <span class="schedule-date">05.17 SAT</span>
+            <div class="schedule-event"><strong>전체 사인회 & 굿즈 판매</strong>오전 11시 — 오후 6시 | 로비</div>
+          </div>
+          <div class="schedule-item reveal reveal-delay-4">
+            <span class="schedule-date">05.18 SUN</span>
+            <div class="schedule-event"><strong>특별 강연 — 웹툰 산업의 미래</strong>오후 2시 — 대강당 | 네이버웹툰 PD 초청</div>
+          </div>
+          <div class="schedule-item reveal">
+            <span class="schedule-date">05.21 WED</span>
+            <div class="schedule-event"><strong>시상식 & 폐막</strong>오후 4시 — 최우수작, 관객상 시상</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-aside">
+        <div class="info-box reveal reveal-delay-1">
+          <div class="info-box-title">관람 안내</div>
+          <div class="info-box-body">
+            <strong>운영 시간</strong><br>
+            평일 10:00 — 19:00<br>
+            주말 10:00 — 21:00<br><br>
+            <strong>입장료</strong><br>
+            무료 (별도 등록 불필요)<br><br>
+            <strong>연령 제한</strong><br>
+            전 연령 관람 가능
+          </div>
+        </div>
+        <div class="info-box reveal reveal-delay-2">
+          <div class="info-box-title">장소</div>
+          <div class="info-box-body">
+            <strong>○○대학교 예술관</strong><br>
+            메인 갤러리 홀 (1–3F)<br>
+            오픈 스튜디오 (4F)<br>
+            대강당 (별관 B1)
+          </div>
+        </div>
+        <div class="info-box reveal reveal-delay-3">
+          <div class="info-box-title">문의</div>
+          <div class="info-box-body">
+            <strong>이메일</strong><br>
+            toonverse2025@univ.ac.kr<br><br>
+            <strong>인스타그램</strong><br>
+            @toonverse_2025
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ LOCATION ═══════════════════ -->
+  <section id="location" class="section-pad">
+    <div class="section-label reveal">Location</div>
+    <h2 class="section-title reveal reveal-delay-1">오시는 길</h2>
+
+    <div class="location-grid">
+      <!-- Map -->
+      <div class="reveal reveal-delay-1">
+        <div class="map-embed" id="mapEmbed" title="지도 클릭 시 네이버지도로 이동">
+          <div class="map-grid-lines"></div>
+          <div class="map-pin">
+            <div class="map-pin-pulse"></div>
+            <div class="map-pin-head"></div>
+            <div class="map-label">○○대학교 예술관</div>
+          </div>
+          <div class="map-open-label">
+            <a href="https://map.naver.com/p/search/서울대학교" target="_blank" rel="noopener" class="map-btn map-btn-naver">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16.273 12.845L7.376 0H0v24h7.727V11.155L16.624 24H24V0h-7.727z"/></svg>
+              네이버지도
+            </a>
+            <a href="https://map.kakao.com/link/search/서울대학교" target="_blank" rel="noopener" class="map-btn map-btn-kakao">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3C6.477 3 2 6.477 2 10.5c0 2.52 1.38 4.74 3.5 6.12L4.5 21l4.1-2.18C9.55 19.27 10.76 19.5 12 19.5c5.523 0 10-3.477 10-7.5S17.523 3 12 3z"/></svg>
+              카카오맵
+            </a>
+          </div>
+        </div>
+        <p style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;color:rgba(242,237,230,0.25);margin-top:10px;text-align:center;">
+          ↑ 클릭하면 네이버지도로 이동합니다
+        </p>
+      </div>
+
+      <!-- Location info -->
+      <div class="location-info">
+        <div class="loc-item reveal reveal-delay-1">
+          <div class="loc-icon">📍</div>
+          <div>
+            <div class="loc-title">주소</div>
+            <div class="loc-body"><strong>서울시 ○○구 ○○로 123</strong><br>○○대학교 예술관</div>
+          </div>
+        </div>
+
+        <div class="loc-item reveal reveal-delay-2">
+          <div class="loc-icon">🚇</div>
+          <div>
+            <div class="loc-title">대중교통</div>
+            <div class="loc-body">
+              <div class="transport-grid">
+                <div class="transport-item"><strong>지하철</strong>○○역 2번 출구<br>도보 5분</div>
+                <div class="transport-item"><strong>버스</strong>○○번, ○○번<br>예술관 정류장 하차</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="loc-item reveal reveal-delay-3">
+          <div class="loc-icon">🚗</div>
+          <div>
+            <div class="loc-title">자가용 & 주차</div>
+            <div class="loc-body">
+              예술관 지하 주차장 이용 가능<br>
+              <strong>2시간 무료</strong> (전시 기간 한정)
+            </div>
+          </div>
+        </div>
+
+        <div class="reveal reveal-delay-4" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px">
+          <a href="https://map.naver.com/p/search/서울대학교" target="_blank" rel="noopener" class="map-btn map-btn-naver" style="font-size:11px">
+            네이버지도로 열기 →
+          </a>
+          <a href="https://map.kakao.com/link/search/서울대학교" target="_blank" rel="noopener" class="map-btn map-btn-kakao" style="font-size:11px">
+            카카오맵으로 열기 →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ CTA ═══════════════════ -->
+  <section id="cta">
+    <div class="cta-title reveal">
+      지금<br>바로<br>방문하세요
+    </div>
+    <p class="cta-sub reveal reveal-delay-1">2025.05.14 — 05.21 · 무료 입장 · ○○대학교 예술관</p>
+    <div class="cta-actions reveal reveal-delay-2">
+      <a href="#location" class="btn-dark">오시는 길 →</a>
+      <a href="#artists" class="btn-white-outline">작가 소개 →</a>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FOOTER ═══════════════════ -->
+  <footer>
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">TOON<span>:</span>VERSE</div>
+        <div class="footer-tagline">대학 웹툰 전시회 2025</div>
+      </div>
+      <div class="footer-cols">
+        <div>
+          <div class="footer-col-title">메뉴</div>
+          <div class="footer-links">
+            <a href="#hero">홈</a>
+            <a href="#about">소개</a>
+            <a href="#gallery">갤러리</a>
+            <a href="#artists">그림 작가들</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-col-title">정보</div>
+          <div class="footer-links">
+            <a href="#info">전시 일정</a>
+            <a href="#location">오시는 길</a>
+            <a href="#cta">관람 등록</a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-col-title">소셜</div>
+          <div class="footer-links">
+            <a href="#" target="_blank" rel="noopener">Instagram</a>
+            <a href="#" target="_blank" rel="noopener">Twitter / X</a>
+            <a href="#" target="_blank" rel="noopener">네이버 포스트</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 TOON:VERSE — ○○대학교 웹툰학과 기획</span>
+      <span class="footer-copy">All rights reserved.</span>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+  <script>
+    // ── Custom Cursor ────────────────────────────────
+    const dot  = document.getElementById('cursorDot');
+    const ring = document.getElementById('cursorRing');
+    let mouseX = 0, mouseY = 0;
+    let ringX  = 0, ringY  = 0;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      dot.style.left  = mouseX + 'px';
+      dot.style.top   = mouseY + 'px';
+    });
+
+    function animateRing() {
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      ring.style.left = ringX + 'px';
+      ring.style.top  = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    const hoverEls = document.querySelectorAll('a, button, .panel, .gcard, .artist-card, .info-box, .feature-pill');
+    hoverEls.forEach(el => {
+      el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+      el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+    });
+
+    // ── Navbar scroll ────────────────────────────────
+    const nav = document.getElementById('mainNav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── Hamburger ────────────────────────────────────
+    const hamburger   = document.getElementById('hamburger');
+    const mobileMenu  = document.getElementById('mobileMenu');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('open');
+      mobileMenu.classList.toggle('open');
+      document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : '';
+    });
+
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // ── Scroll reveal ────────────────────────────────
+    const reveals = document.querySelectorAll('.reveal');
+    const revealObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revealObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => revealObs.observe(el));
+
+    // ── Map embed click ───────────────────────────────
+    document.getElementById('mapEmbed').addEventListener('click', function(e) {
+      if (!e.target.closest('a')) {
+        window.open('https://map.naver.com/p/search/서울대학교', '_blank', 'noopener');
+      }
+    });
+
+    // ── Ticker duplicate for seamless loop ───────────
+    const track = document.querySelector('.ticker-track');
+    track.innerHTML += track.innerHTML;
+
+    // ── Panel tilt on mouse ───────────────────────────
+    document.querySelectorAll('.panel').forEach(panel => {
+      panel.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width  - 0.5;
+        const y = (e.clientY - rect.top)  / rect.height - 0.5;
+        this.style.transform = `scale(1.03) rotateY(${x * 8}deg) rotateX(${-y * 6}deg)`;
+      });
+      panel.addEventListener('mouseleave', function() {
+        this.style.transform = '';
+      });
+    });
+
+    // ── Artist card tilt ──────────────────────────────
+    document.querySelectorAll('.artist-card').forEach(card => {
+      card.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width  - 0.5;
+        const y = (e.clientY - rect.top)  / rect.height - 0.5;
+        this.style.transform = `translateY(-6px) rotateY(${x * 6}deg) rotateX(${-y * 4}deg)`;
+      });
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = '';
+      });
+    });
+
+    // ── Parallax on hero panels ───────────────────────
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      document.querySelectorAll('.panel').forEach((p, i) => {
+        const factor = (i % 2 === 0 ? 0.05 : -0.04);
+        p.style.transform = `translateY(${scrollY * factor}px)`;
+      });
+    });
+
+    // ── Counter animation ─────────────────────────────
+    function animateCounter(el, end, duration) {
+      let start = 0;
+      const step = end / (duration / 16);
+      const timer = setInterval(() => {
+        start += step;
+        if (start >= end) { el.textContent = end + (el.dataset.suffix || ''); clearInterval(timer); return; }
+        el.textContent = Math.floor(start) + (el.dataset.suffix || '');
+      }, 16);
+    }
+
+    const counterObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const nums = e.target.querySelectorAll('.hero-meta-num');
+          nums[0] && animateCounter(nums[0], 48,  900);
+          nums[1] && (nums[1].dataset.suffix = '+') && animateCounter(nums[1], 120, 1100);
+          counterObs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    const heroMeta = document.querySelector('.hero-meta');
+    if (heroMeta) counterObs.observe(heroMeta);
+  </script>
 </body>
 </html>
